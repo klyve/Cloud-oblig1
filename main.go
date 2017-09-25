@@ -6,14 +6,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/caarlos0/env"
 	"github.com/gorilla/mux"
 
 	"github.com/klyve/cloud-oblig1/api/github"
 )
 
 type Config struct {
-	Port int `env:"PORT" envDefault:"80"`
+	Port int
 }
 
 func GetHomePage(w http.ResponseWriter, req *http.Request) {
@@ -27,8 +26,7 @@ func Initialize(testing bool) {
 	router := mux.NewRouter()
 
 	// Get the environment variables
-	cfg := Config{}
-	env.Parse(&cfg)
+	cfg := Config{Port: 80}
 
 	p := strconv.Itoa(cfg.Port)
 	portAddr := ":" + p
