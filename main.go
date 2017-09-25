@@ -16,15 +16,11 @@ type Config struct {
 	Port int `env:"PORT" envDefault:"3000"`
 }
 
-func GetPersonEndpoint(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "Whats up?")
-}
-
 func GetHomePage(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "Hello world")
 }
 
-func main() {
+func Main(testing bool) {
 	router := mux.NewRouter()
 
 	// Get the environment variables
@@ -34,9 +30,10 @@ func main() {
 	p := strconv.Itoa(cfg.Port)
 	portAddr := ":" + p
 
-	subRouter := router.PathPrefix("/api").Subrouter()
+	subRouter := router.PathPrefix("/projectinfo/v1/github.com/").Subrouter()
 	githubapi.Initialize(subRouter)
 	router.HandleFunc("/", GetHomePage).Methods("GET")
-	router.HandleFunc("/people", GetPersonEndpoint).Methods("GET")
-	log.Fatal(http.ListenAndServe(portAddr, router))
+	if !testing {
+		log.Fatal(http.ListenAndServe(portAddr, router))
+	}
 }
