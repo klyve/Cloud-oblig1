@@ -22,7 +22,7 @@ type Languages struct {
 }
 
 type Response struct {
-	Name          string   `json:"name"`
+	Name          string   `json:"project"`
 	Owner         string   `json:"owner"`
 	Committer     string   `json:"committer"`
 	Contributions int      `json:"contributions"`
