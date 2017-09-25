@@ -25,8 +25,8 @@ type Response struct {
 	Name          string   `json:"project"`
 	Owner         string   `json:"owner"`
 	Committer     string   `json:"committer"`
-	Contributions int      `json:"contributions"`
-	Languages     []string `json:"languages"`
+	Contributions int      `json:"commits"`
+	Languages     []string `json:"language"`
 }
 
 type Error struct {
