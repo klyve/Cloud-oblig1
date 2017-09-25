@@ -22,6 +22,7 @@ func TestGetHomePage(t *testing.T) {
 			status, http.StatusOK)
 	}
 
+	// Check the response body is what we expect.
 	expected := `Hello world`
 	if rr.Body.String() != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
@@ -30,5 +31,5 @@ func TestGetHomePage(t *testing.T) {
 }
 
 func TestMain(t *testing.T) {
-	Main(true)
+	Initialize(true)
 }

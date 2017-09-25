@@ -13,14 +13,17 @@ import (
 )
 
 type Config struct {
-	Port int `env:"PORT" envDefault:"3000"`
+	Port int `env:"PORT" envDefault:"80"`
 }
 
 func GetHomePage(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "Hello world")
 }
 
-func Main(testing bool) {
+func main() {
+	Initialize(false)
+}
+func Initialize(testing bool) {
 	router := mux.NewRouter()
 
 	// Get the environment variables

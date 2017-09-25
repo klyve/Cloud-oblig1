@@ -17,9 +17,10 @@ func FindRepository(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	w.Header().Set("Content-Type", "application/json")
 	response := FetchAllJsonData(vars["username"], vars["repository"])
+
 	output, err := json.MarshalIndent(response, "", "    ")
 	if err != nil {
-		ReturnErrorCode(500, "Internal server error", w)
+		ReturnErrorCode(404, "Not found", w)
 		return
 	}
 	fmt.Fprintf(w, string(output))

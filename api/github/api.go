@@ -62,10 +62,10 @@ func FetchAllJsonData(username string, repo string) interface{} {
 		fmt.Printf("Could not fetch json contributors %v", err3)
 		return CreateErrorCode(500, "Internal server error")
 	}
-	fmt.Printf("We here")
 	prim := FormatPrimaryJson(json)
 	lang := FormatLanguagesJson(json2)
 	contrib := FormatCommitterJson(json3)
+	// contrib := ReadContributorsFile("./api/github/json/contributors.json")
 	return CombineJsonData(prim, lang, contrib)
 }
 
@@ -74,7 +74,7 @@ func FetchJsonData(url string) ([]byte, interface{}) {
 	if err != nil {
 		return nil, "Could not fetch data from github api"
 	}
-	defer resp.Body.Close()
+	// defer resp.Body.Close()
 	body, readError := ioutil.ReadAll(resp.Body)
 	// fmt.Printf("%v", body)
 	if readError != nil {
@@ -84,7 +84,7 @@ func FetchJsonData(url string) ([]byte, interface{}) {
 
 	jsonError := json.Unmarshal(body, &jsontype)
 	if jsonError != nil {
-		return nil, "Could not parse response body"
+		return body, nil
 	}
 	if jsontype.Message != "" {
 		return nil, "Rate limit exceeded"
