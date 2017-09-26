@@ -6,7 +6,8 @@ import (
 	"sort"
 )
 
-func FormatPrimaryJson(data []byte) Primary {
+// FormatPrimaryJSON Formats the primary data from the repo
+func FormatPrimaryJSON(data []byte) Primary {
 	var jsontype Primary
 	jsonError := json.Unmarshal(data, &jsontype)
 	if jsonError != nil {
@@ -15,7 +16,8 @@ func FormatPrimaryJson(data []byte) Primary {
 	return jsontype
 }
 
-func FormatLanguagesJson(data []byte) Languages {
+// FormatLanguagesJSON Formats the languages
+func FormatLanguagesJSON(data []byte) Languages {
 
 	var jsontype map[string]interface{}
 	jsonError := json.Unmarshal(data, &jsontype)
@@ -42,8 +44,8 @@ func FormatLanguagesJson(data []byte) Languages {
 	return langList
 }
 
-func FormatCommitterJson(data []byte) Committer {
-	fmt.Printf("%v", string(data))
+// FormatCommitterJSON formats the committers
+func FormatCommitterJSON(data []byte) Committer {
 	var jsontype []Committer
 	jsonError := json.Unmarshal(data, &jsontype)
 	if jsonError != nil {
@@ -52,6 +54,7 @@ func FormatCommitterJson(data []byte) Committer {
 	return jsontype[0]
 }
 
+// CreateErrorCode returns an error code object
 func CreateErrorCode(code int, message string) Error {
 	return Error{
 		Code:    code,

@@ -8,15 +8,16 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Some comment
+// Initialize the api endpoint
 func Initialize(router *mux.Router) {
 	router.HandleFunc("/{username}/{repository}", FindRepository).Methods("GET")
 }
 
+// FindRepository http handler
 func FindRepository(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	w.Header().Set("Content-Type", "application/json")
-	response := FetchAllJsonData(vars["username"], vars["repository"])
+	response := FetchAllJSONData(vars["username"], vars["repository"], FetchJSONData)
 
 	output, err := json.MarshalIndent(response, "", "    ")
 	if err != nil {

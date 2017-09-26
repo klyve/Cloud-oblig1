@@ -1,6 +1,10 @@
 package githubapi
 
-import "testing"
+import (
+	"io/ioutil"
+	"strings"
+	"testing"
+)
 
 func TestJsonPrimaryParsing(t *testing.T) {
 	file := "./json/primary.json"
@@ -43,7 +47,7 @@ func TestReadLanguagesFile(t *testing.T) {
 	}
 }
 
-func TestJsonContributorsParsing(t *testing.T) {
+func TestJSONContributorsParsing(t *testing.T) {
 	file := "./json/contributors.json"
 	resp := ReadContributorsFile(file)
 	if resp.Contributions != 18497 {
@@ -64,7 +68,7 @@ func TestCreateErrorCode(t *testing.T) {
 	}
 }
 
-func TestCombineJson(t *testing.T) {
+func TestCombineJSON(t *testing.T) {
 	primary := ReadPrimaryFile("./json/primary.json")
 	language := ReadLanguagesFile("./json/languages.json")
 	contrib := ReadContributorsFile("./json/contributors.json")
@@ -87,7 +91,7 @@ func TestCombineJson(t *testing.T) {
 	match[15] = "Assembly"
 	match[16] = "Objective-C"
 
-	combined := CombineJsonData(primary, language, contrib)
+	combined := CombineJSONData(primary, language, contrib)
 	for i := range match {
 		if combined.Languages[i] != match[i] {
 			t.Fail()
@@ -107,4 +111,70 @@ func TestCombineJson(t *testing.T) {
 		t.Error()
 	}
 
+}
+
+func fetchDataMock(url string) ([]byte, interface{}) {
+	split := strings.Split(url, "/")
+	var path string
+	switch split[len(split)-1] {
+	case "languages":
+		{
+			path = "./json/languages.json"
+		}
+	case "contributors":
+		{
+			path = "./json/contributors.json"
+		}
+	default:
+		{
+			path = "./json/primary.json"
+		}
+	}
+	file, e := ioutil.ReadFile(path)
+	if e != nil {
+		return nil, true
+	}
+	return file, nil
+}
+
+func TestFetchAllJSONData(t *testing.T) {
+	json := FetchAllJSONData("git", "git", fetchDataMock)
+	combined := json.(Response)
+	match := make([]string, 17)
+	match[0] = "C"
+	match[1] = "Shell"
+	match[2] = "Perl"
+	match[3] = "Tcl"
+	match[4] = "Python"
+	match[5] = "C++"
+	match[6] = "Makefile"
+	match[7] = "Emacs Lisp"
+	match[8] = "JavaScript"
+	match[9] = "M4"
+	match[10] = "Roff"
+	match[11] = "Perl 6"
+	match[12] = "Go"
+	match[13] = "CSS"
+	match[14] = "PHP"
+	match[15] = "Assembly"
+	match[16] = "Objective-C"
+
+	for i := range match {
+		if combined.Languages[i] != match[i] {
+			t.Fail()
+		}
+	}
+	if combined.Committer != "gitster" {
+		t.Fail()
+	}
+	if combined.Contributions != 18497 {
+		t.Error()
+	}
+
+	if combined.Name != "git" {
+		t.Error()
+	}
+	if combined.Owner != "git" {
+		t.Error()
+	}
 }

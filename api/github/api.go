@@ -8,15 +8,18 @@ import (
 	"os"
 )
 
+// ReadPrimaryFile reads the primary file for testing
 func ReadPrimaryFile(path string) Primary {
 	file, e := ioutil.ReadFile(path)
 	if e != nil {
 		fmt.Printf("File error: %v\n", e)
 		os.Exit(1)
 	}
-	jsontype := FormatPrimaryJson(file)
+	jsontype := FormatPrimaryJSON(file)
 	return jsontype
 }
+
+// ReadLanguagesFile reads the languages file for testing
 func ReadLanguagesFile(path string) Languages {
 	file, e := ioutil.ReadFile(path)
 	if e != nil {
@@ -24,9 +27,11 @@ func ReadLanguagesFile(path string) Languages {
 		os.Exit(1)
 	}
 	// fmt.Printf("%s\n", string(file))
-	langList := FormatLanguagesJson(file)
+	langList := FormatLanguagesJSON(file)
 	return langList
 }
+
+// ReadContributorsFile reads the contributors file for testing
 func ReadContributorsFile(path string) Committer {
 	file, e := ioutil.ReadFile(path)
 	if e != nil {
@@ -34,42 +39,41 @@ func ReadContributorsFile(path string) Committer {
 		os.Exit(1)
 	}
 
-	contributors := FormatCommitterJson(file)
+	contributors := FormatCommitterJSON(file)
 
 	return contributors
 }
 
-// func ReadJsonFile() Response {
-// 	prim := ReadPrimaryFile()
-// 	lang := ReadLanguagesFile()
-// 	contrib := ReadContributorsFile()
-// 	return CombineJsonData(prim, lang, contrib)
-// }
+// FetchJSONFunc type for Dependency injection
+type FetchJSONFunc func(string) ([]byte, interface{})
 
-func FetchAllJsonData(username string, repo string) interface{} {
-	json, err := FetchJsonData("https://api.github.com/repos/" + username + "/" + repo)
+// FetchAllJSONData fetches the json data and combines it
+func FetchAllJSONData(username string, repo string, fetcData FetchJSONFunc) interface{} {
+
+	json, err := fetcData("https://api.github.com/repos/" + username + "/" + repo)
 	if err != nil {
 		fmt.Printf("Could not fetch json %v", err)
 		return CreateErrorCode(500, "Internal server error")
 	}
-	json2, err2 := FetchJsonData("https://api.github.com/repos/" + username + "/" + repo + "/languages")
+	json2, err2 := fetcData("https://api.github.com/repos/" + username + "/" + repo + "/languages")
 	if err2 != nil {
 		fmt.Printf("Could not fetch json %v", err2)
 		return CreateErrorCode(500, "Internal server error")
 	}
-	json3, err3 := FetchJsonData("https://api.github.com/repos/" + username + "/" + repo + "/contributors")
+	json3, err3 := fetcData("https://api.github.com/repos/" + username + "/" + repo + "/contributors")
 	if err3 != nil {
 		fmt.Printf("Could not fetch json contributors %v", err3)
 		return CreateErrorCode(500, "Internal server error")
 	}
-	prim := FormatPrimaryJson(json)
-	lang := FormatLanguagesJson(json2)
-	contrib := FormatCommitterJson(json3)
+	prim := FormatPrimaryJSON(json)
+	lang := FormatLanguagesJSON(json2)
+	contrib := FormatCommitterJSON(json3)
 	// contrib := ReadContributorsFile("./api/github/json/contributors.json")
-	return CombineJsonData(prim, lang, contrib)
+	return CombineJSONData(prim, lang, contrib)
 }
 
-func FetchJsonData(url string) ([]byte, interface{}) {
+// FetchJSONData fetches the json data from the web
+func FetchJSONData(url string) ([]byte, interface{}) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, "Could not fetch data from github api"
@@ -93,7 +97,8 @@ func FetchJsonData(url string) ([]byte, interface{}) {
 	return body, nil
 }
 
-func CombineJsonData(p Primary, l Languages, c Committer) Response {
+// CombineJSONData combines the data into a struct
+func CombineJSONData(p Primary, l Languages, c Committer) Response {
 	var res Response
 	res.Name = p.Name
 	res.Owner = p.Owner.Login
@@ -104,6 +109,7 @@ func CombineJsonData(p Primary, l Languages, c Committer) Response {
 	return res
 }
 
+// ReturnErrorCode returns an error code
 func ReturnErrorCode(code int, message string, w http.ResponseWriter) {
 	outError, oerr := json.MarshalIndent(CreateErrorCode(code, message), "", "     ")
 	if oerr != nil {
